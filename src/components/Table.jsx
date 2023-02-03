@@ -1,42 +1,4 @@
-import { useEffect, useState } from "react";
-// import { CiEdit, CiTrash } from "react-icons/ci";
-import { Link } from "react-router-dom";
-
-const URLAPI = "https://localhost:7121/api/Empleado";
-
-export default function Table({ updatelista, setUpdatelista }) {
-  const [empleados, setEmpleados] = useState([]);
-  const [loader, setLoader] = useState(true);
-
-  useEffect(() => {
-    fetch(URLAPI)
-      .then((resp) => resp.json())
-      .then((data) => {
-        setEmpleados(data);
-        setLoader(false);
-        setUpdatelista(false);
-      })
-      .catch((e) => console.log(e));
-  }, [updatelista]);
-
-  const handleDelete = async (id) => {    
-    try {
-      const request = await fetch(`${URLAPI}/?id=${id}`, {
-        method: "DELETE",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await request.text();
-      if (data) {
-        setUpdatelista(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+export default function Table({ loader, empleados, handleEdit, handleDelete }) {
   return (
     <div className="relative overflow-x-auto mt-10 rounded-lg">
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -89,8 +51,11 @@ export default function Table({ updatelista, setUpdatelista }) {
               <td className="px-6 py-4">{empleado.nombre}</td>
               <td className="px-6 py-4">{empleado.apellido}</td>
               <td className="px-6 py-4">{empleado.puesto}</td>
-              <td className="px-6 py-4 dark:text-white">
-                <Link to={`/edit/${empleado.id}`}>Editar</Link>
+              <td
+                className="px-6 py-4 dark:text-white cursor-pointer"
+                onClick={() => handleEdit(empleado.id, empleado)}
+              >
+                Editar
               </td>
               <td
                 className="px-6 py-4 dark:text-white delete-e"

@@ -1,38 +1,12 @@
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import Select from "./Select";
 
-const URLAPI = "https://localhost:7121/api/Empleado";
-
-export default function Form({ setUpdatelista }) {  
-  const navigate = useNavigate();
+export default function Form({ guardaEmpleado }) {  
   const form = useRef(null);    
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(form.current);
-    const bodyjson = JSON.stringify({
-      nombre: formData.get("nombre"),
-      apellido: formData.get("apellido"),
-      puestoId: Number(formData.get("puesto")),
-    });
-    try {
-      const request = await fetch(URLAPI, {
-        method: "post",
-        body: bodyjson,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await request.text();
-      if (data) {
-        setUpdatelista(true);
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    guardaEmpleado(form)
   };
 
   return (
