@@ -1,52 +1,24 @@
-import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useRef } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import Select from "../components/Select";
-
-const URLAPI = "https://localhost:7121/api/Empleado";
-
+import useEmpleados from "../hooks/useEmpleados"
 export default function Edit() {
+  const { empleado, consultarEmpleado, guardaEmpleado } = useEmpleados();
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [empleadConsult, setEmpleadConsult] = useState(null);
+  const { state } = useLocation();
   const form = useRef(null);
 
-  if (id) {
-    useEffect(() => {
-      fetch(`${URLAPI}/${id}`)
-        .then((resp) => resp.json())
-        .then((data) => {
-          setEmpleadConsult(data[0]);
-        })
-        .catch((e) => console.log(e));
-    }, []);
+  let empleadConsult;
+  if (state?.empleado) {
+    empleadConsult = state.empleado;
+  } else {
+    consultarEmpleado(id);
+    empleadConsult = empleado;
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(form.current);
-    const bodyjson = {
-      empleadoId: Number(id),
-      nombre: formData.get("nombre"),
-      apellido: formData.get("apellido"),
-      puestoId: Number(formData.get("puesto")),
-    };
-    console.log(bodyjson);
-    try {
-      const request = await fetch(URLAPI, {
-        method: "put",
-        body: bodyjson,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await request.text();
-      if (data) {
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    guardaEmpleado(form, id)
   };
 
   return (
